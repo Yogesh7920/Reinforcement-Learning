@@ -1,9 +1,10 @@
 import numpy as np
 from pprint import pprint
+from copy import deepcopy
 
 
 reward = np.array([
-    [100, -1, 1],
+    [-1, -1, 10],
     [-1, -1, -1],
     [0, -1, -1]
 ])
@@ -29,7 +30,7 @@ def take_action(x, y, action):
     return x, y
 
 
-def reward_gain(x, y):
+def reward_gain(x, y, next_values):
 
     gains = []
     for action in actions:
@@ -40,7 +41,7 @@ def reward_gain(x, y):
     gains = np.array(gains)
     best_action = np.argmax(gains)
 
-    values[x][y] = gains[best_action]
+    next_values[x][y] = gains[best_action]
     best_action = actions[best_action]
     old = policy[x][y]
     policy[x][y] = best_action
@@ -49,11 +50,15 @@ def reward_gain(x, y):
 
 if __name__ == '__main__':
     flag = False
-    for t in range(5):
+    for _ in range(10):
         flag = True
+        next_values = deepcopy(values)
+
         for i in range(3):
             for j in range(3):
-                flag &= reward_gain(i, j)
+                flag &= reward_gain(i, j, next_values)
+
+        values = next_values
         if flag:
             break
 
