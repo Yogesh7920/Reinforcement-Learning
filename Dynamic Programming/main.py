@@ -4,17 +4,19 @@ from copy import deepcopy
 
 
 reward = np.array([
-    [-1, -1, 10],
-    [-1, -1, -1],
-    [0, -1, -1]
+    [2, 3, -1, 0],
+    [1, 1, 9, 3],
+    [4, 5, 7, -6],
+    [2, -8, -3, 9]
 ])
 
-actions = ['S', 'L', 'R', 'U', 'D']
-values = np.zeros((3, 3))
-policy = [['S' for _ in range(3)] for _ in range(3)]
+actions = ['L', 'R', 'U', 'D']
+values = np.zeros((len(reward), len(reward[0])))
+policy = [['L' for _ in range(len(reward[0]))] for _ in range(len(reward))]
 
 
 def take_action(x, y, action):
+
     if action == 'L':
         y -= 1
     elif action == 'R':
@@ -24,18 +26,20 @@ def take_action(x, y, action):
     elif action == 'D':
         x += 1
 
+    xo, yo = x, y
+
     x = max(min(x, len(reward)-1), 0)
     y = max(min(y, len(reward[0])-1), 0)
 
-    return x, y
+    return x, y, (xo != x or yo != y)
 
 
-def reward_gain(x, y, next_values):
+def reward_gain(x, y, next_values, hit_penalty=False):
 
     gains = []
     for action in actions:
-        nx, ny = take_action(x, y, action)
-        gain = values[nx][ny] + reward[nx][ny]
+        nx, ny, hit = take_action(x, y, action)
+        gain = values[nx][ny] + reward[nx][ny] - 500 * hit * hit_penalty
         gains.append(gain)
 
     gains = np.array(gains)
@@ -54,9 +58,9 @@ if __name__ == '__main__':
         flag = True
         next_values = deepcopy(values)
 
-        for i in range(3):
-            for j in range(3):
-                flag &= reward_gain(i, j, next_values)
+        for i in range(len(reward)):
+            for j in range(len(reward[0])):
+                flag &= reward_gain(i, j, next_values, True)
 
         values = next_values
         if flag:
