@@ -3,12 +3,12 @@ from copy import deepcopy
 
 
 reward = np.array([
-    [1, 0, -1],
+    [1, 0, 1],
     [-1, 3, 2],
     [2, -1, 1]
 ])
 
-actions = ['S', 'L', 'R', 'U', 'D']
+actions = ['S', 'R', 'U', 'L', 'D']
 values = np.zeros((len(reward), len(reward[0])))
 policy = [['S' for _ in range(len(reward[0]))] for _ in range(len(reward))]
 
@@ -52,7 +52,7 @@ def reward_gain(x, y, next_values, hit_penalty=False):
 
 if __name__ == '__main__':
     flag = False
-    for _ in range(3):
+    for t in range(3):
         flag = True
         next_values = deepcopy(values)
 
@@ -61,8 +61,11 @@ if __name__ == '__main__':
                 flag &= reward_gain(i, j, next_values, True)
 
         values = next_values
+        print(t+1, "- V:")
         print(next_values)
+        print(t+1, "- P:")
+        print(np.matrix(policy))
         if flag:
             break
 
-    print(np.matrix(policy))
+    # print(np.matrix(policy))
